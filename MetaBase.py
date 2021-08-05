@@ -1,16 +1,13 @@
 """https://docs.python.org/3/reference/datamodel.html#metaclasses"""
 
- 
-
 import logging
 
 import sys
+from io import StringIO
 
- 
+log_stream = StringIO()
+logging.basicConfig(stream=log_stream)
 
-logging.basicConfig(stream=sys.stdout)
-
- 
 
 class MetaBase(type):
 
@@ -57,6 +54,8 @@ class Parent(Base):
         self.__logger.error('func parent')
 
  
+
+
 
 p = Parent()
 

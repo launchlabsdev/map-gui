@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
+import os
 
-
-from PySide2.QtCore import (QCoreApplication, QMetaObject, QObject, QPoint,
-    QRect, QSize, QUrl, Qt)
-from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
-    QFontDatabase, QIcon, QLinearGradient, QPalette, QPainter, QPixmap,
-    QRadialGradient)
+from PySide2.QtCore import (QCoreApplication, QMetaObject, QRect, QSize, Qt, QUrl)
+from PySide2.QtGui import (QBrush, QColor, QFont,
+                           QIcon, QPalette)
 from PySide2.QtWidgets import *
-
-import files_rc
+from map_widget import MapWidget
+from MetaBase import log_stream
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -59,9 +57,9 @@ class Ui_MainWindow(object):
         palette.setBrush(QPalette.Active, QPalette.ToolTipText, brush6)
         brush11 = QBrush(QColor(210, 210, 210, 128))
         brush11.setStyle(Qt.NoBrush)
-#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+        # if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
         palette.setBrush(QPalette.Active, QPalette.PlaceholderText, brush11)
-#endif
+        # endif
         palette.setBrush(QPalette.Inactive, QPalette.WindowText, brush)
         palette.setBrush(QPalette.Inactive, QPalette.Button, brush1)
         palette.setBrush(QPalette.Inactive, QPalette.Light, brush2)
@@ -82,9 +80,9 @@ class Ui_MainWindow(object):
         palette.setBrush(QPalette.Inactive, QPalette.ToolTipText, brush6)
         brush12 = QBrush(QColor(210, 210, 210, 128))
         brush12.setStyle(Qt.NoBrush)
-#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+        # if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
         palette.setBrush(QPalette.Inactive, QPalette.PlaceholderText, brush12)
-#endif
+        # endif
         palette.setBrush(QPalette.Disabled, QPalette.WindowText, brush4)
         palette.setBrush(QPalette.Disabled, QPalette.Button, brush1)
         palette.setBrush(QPalette.Disabled, QPalette.Light, brush2)
@@ -107,25 +105,54 @@ class Ui_MainWindow(object):
         palette.setBrush(QPalette.Disabled, QPalette.ToolTipText, brush6)
         brush14 = QBrush(QColor(210, 210, 210, 128))
         brush14.setStyle(Qt.NoBrush)
-#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+        # if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
         palette.setBrush(QPalette.Disabled, QPalette.PlaceholderText, brush14)
-#endif
+        # endif
         MainWindow.setPalette(palette)
         font = QFont()
         font.setFamily(u"Segoe UI")
         font.setPointSize(10)
         MainWindow.setFont(font)
         MainWindow.setStyleSheet(u"QMainWindow {background: transparent; }\n"
-"QToolTip {\n"
-"	color: #ffffff;\n"
-"	background-color: rgba(27, 29, 35, 160);\n"
-"	border: 1px solid rgb(40, 40, 40);\n"
-"	border-radius: 2px;\n"
-"}")
+                                 "QToolTip {\n"
+                                 "	color: #ffffff;\n"
+                                 "	background-color: rgba(27, 29, 35, 160);\n"
+                                 "	border: 1px solid rgb(40, 40, 40);\n"
+                                 "	border-radius: 2px;\n"
+                                 "}")
         self.centralwidget = QWidget(MainWindow)
+        self.modal = QWidget()
+        self.modal.setObjectName("logging_info")
+        self.modal.setWindowTitle("Logger")
+        self.modal.setMinimumSize(400, 300)
+        self.modal.setStyleSheet(u"/* LINE EDIT */\n"
+                                 "QTextEdit {\n"
+                                 "	background-color: rgb(0, 0, 0);\n"
+                                 "color: white;\n"
+                                 "	border-radius: 5px;\n"
+                                 "	border: 2px solid rgb(27, 29, 35);\n"
+                                 "	padding-left: 10px;\n"
+                                 "}\n"
+                                 "QLineEdit:hover {\n"
+                                 "	border: 2px solid rgb(64, 71, 88);\n"
+                                 "}\n"
+                                 "QLineEdit:focus {\n"
+                                 "	border: 2px solid rgb(91, 101, 124);\n"
+                                 "}\n"
+                                 "\n"
+                                 "")
+        self.label_modal = QTextEdit(self.modal)
+        self.label_modal.setReadOnly(True)
+        font = QFont()
+        font.setFamily(u"Segoe UI")
+        font.setPointSize(16)
+        self.label_modal.setFont(font)
+        self.label_modal.setMinimumSize(400,300)
+        self.label_modal.setAlignment(Qt.AlignLeft | Qt.AlignLeading)
+        
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setStyleSheet(u"background: transparent;\n"
-"color: rgb(210, 210, 210);")
+                                         "color: rgb(210, 210, 210);")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -133,215 +160,215 @@ class Ui_MainWindow(object):
         self.frame_main = QFrame(self.centralwidget)
         self.frame_main.setObjectName(u"frame_main")
         self.frame_main.setStyleSheet(u"/* LINE EDIT */\n"
-"QLineEdit {\n"
-"	background-color: rgb(27, 29, 35);\n"
-"	border-radius: 5px;\n"
-"	border: 2px solid rgb(27, 29, 35);\n"
-"	padding-left: 10px;\n"
-"}\n"
-"QLineEdit:hover {\n"
-"	border: 2px solid rgb(64, 71, 88);\n"
-"}\n"
-"QLineEdit:focus {\n"
-"	border: 2px solid rgb(91, 101, 124);\n"
-"}\n"
-"\n"
-"/* SCROLL BARS */\n"
-"QScrollBar:horizontal {\n"
-"    border: none;\n"
-"    background: rgb(52, 59, 72);\n"
-"    height: 14px;\n"
-"    margin: 0px 21px 0 21px;\n"
-"	border-radius: 0px;\n"
-"}\n"
-"QScrollBar::handle:horizontal {\n"
-"    background: rgb(85, 170, 255);\n"
-"    min-width: 25px;\n"
-"	border-radius: 7px\n"
-"}\n"
-"QScrollBar::add-line:horizontal {\n"
-"    border: none;\n"
-"    background: rgb(55, 63, 77);\n"
-"    width: 20px;\n"
-"	border-top-right-radius: 7px;\n"
-"    border-bottom-right-radius: 7px;\n"
-"    subcontrol-position: right;\n"
-"    subcontrol-origin: margin;\n"
-"}\n"
-"QScrollBar::sub-line:horizontal {\n"
-"    border: none;\n"
-"    background: rgb(55, 63, 77);\n"
-"    width: 20px;\n"
-""
-                        "	border-top-left-radius: 7px;\n"
-"    border-bottom-left-radius: 7px;\n"
-"    subcontrol-position: left;\n"
-"    subcontrol-origin: margin;\n"
-"}\n"
-"QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal\n"
-"{\n"
-"     background: none;\n"
-"}\n"
-"QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal\n"
-"{\n"
-"     background: none;\n"
-"}\n"
-" QScrollBar:vertical {\n"
-"	border: none;\n"
-"    background: rgb(52, 59, 72);\n"
-"    width: 14px;\n"
-"    margin: 21px 0 21px 0;\n"
-"	border-radius: 0px;\n"
-" }\n"
-" QScrollBar::handle:vertical {	\n"
-"	background: rgb(85, 170, 255);\n"
-"    min-height: 25px;\n"
-"	border-radius: 7px\n"
-" }\n"
-" QScrollBar::add-line:vertical {\n"
-"     border: none;\n"
-"    background: rgb(55, 63, 77);\n"
-"     height: 20px;\n"
-"	border-bottom-left-radius: 7px;\n"
-"    border-bottom-right-radius: 7px;\n"
-"     subcontrol-position: bottom;\n"
-"     subcontrol-origin: margin;\n"
-" }\n"
-" QScrollBar::sub-line:vertical {\n"
-"	border: none;\n"
-"    background: rgb(55, 63"
-                        ", 77);\n"
-"     height: 20px;\n"
-"	border-top-left-radius: 7px;\n"
-"    border-top-right-radius: 7px;\n"
-"     subcontrol-position: top;\n"
-"     subcontrol-origin: margin;\n"
-" }\n"
-" QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
-"     background: none;\n"
-" }\n"
-"\n"
-" QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
-"     background: none;\n"
-" }\n"
-"\n"
-"/* CHECKBOX */\n"
-"QCheckBox::indicator {\n"
-"    border: 3px solid rgb(52, 59, 72);\n"
-"	width: 15px;\n"
-"	height: 15px;\n"
-"	border-radius: 10px;\n"
-"    background: rgb(44, 49, 60);\n"
-"}\n"
-"QCheckBox::indicator:hover {\n"
-"    border: 3px solid rgb(58, 66, 81);\n"
-"}\n"
-"QCheckBox::indicator:checked {\n"
-"    background: 3px solid rgb(52, 59, 72);\n"
-"	border: 3px solid rgb(52, 59, 72);	\n"
-"	background-image: url(:/16x16/icons/16x16/cil-check-alt.png);\n"
-"}\n"
-"\n"
-"/* RADIO BUTTON */\n"
-"QRadioButton::indicator {\n"
-"    border: 3px solid rgb(52, 59, 72);\n"
-"	width: 15px;\n"
-"	height: 15px;\n"
-"	border-radius"
-                        ": 10px;\n"
-"    background: rgb(44, 49, 60);\n"
-"}\n"
-"QRadioButton::indicator:hover {\n"
-"    border: 3px solid rgb(58, 66, 81);\n"
-"}\n"
-"QRadioButton::indicator:checked {\n"
-"    background: 3px solid rgb(94, 106, 130);\n"
-"	border: 3px solid rgb(52, 59, 72);	\n"
-"}\n"
-"\n"
-"/* COMBOBOX */\n"
-"QComboBox{\n"
-"	background-color: rgb(27, 29, 35);\n"
-"	border-radius: 5px;\n"
-"	border: 2px solid rgb(27, 29, 35);\n"
-"	padding: 5px;\n"
-"	padding-left: 10px;\n"
-"}\n"
-"QComboBox:hover{\n"
-"	border: 2px solid rgb(64, 71, 88);\n"
-"}\n"
-"QComboBox::drop-down {\n"
-"	subcontrol-origin: padding;\n"
-"	subcontrol-position: top right;\n"
-"	width: 25px; \n"
-"	border-left-width: 3px;\n"
-"	border-left-color: rgba(39, 44, 54, 150);\n"
-"	border-left-style: solid;\n"
-"	border-top-right-radius: 3px;\n"
-"	border-bottom-right-radius: 3px;	\n"
-"	background-image: url(:/16x16/icons/16x16/cil-arrow-bottom.png);\n"
-"	background-position: center;\n"
-"	background-repeat: no-reperat;\n"
-" }\n"
-"QComboBox QAbstractItemView {\n"
-"	color: rgb("
-                        "85, 170, 255);	\n"
-"	background-color: rgb(27, 29, 35);\n"
-"	padding: 10px;\n"
-"	selection-background-color: rgb(39, 44, 54);\n"
-"}\n"
-"\n"
-"/* SLIDERS */\n"
-"QSlider::groove:horizontal {\n"
-"    border-radius: 9px;\n"
-"    height: 18px;\n"
-"	margin: 0px;\n"
-"	background-color: rgb(52, 59, 72);\n"
-"}\n"
-"QSlider::groove:horizontal:hover {\n"
-"	background-color: rgb(55, 62, 76);\n"
-"}\n"
-"QSlider::handle:horizontal {\n"
-"    background-color: rgb(85, 170, 255);\n"
-"    border: none;\n"
-"    height: 18px;\n"
-"    width: 18px;\n"
-"    margin: 0px;\n"
-"	border-radius: 9px;\n"
-"}\n"
-"QSlider::handle:horizontal:hover {\n"
-"    background-color: rgb(105, 180, 255);\n"
-"}\n"
-"QSlider::handle:horizontal:pressed {\n"
-"    background-color: rgb(65, 130, 195);\n"
-"}\n"
-"\n"
-"QSlider::groove:vertical {\n"
-"    border-radius: 9px;\n"
-"    width: 18px;\n"
-"    margin: 0px;\n"
-"	background-color: rgb(52, 59, 72);\n"
-"}\n"
-"QSlider::groove:vertical:hover {\n"
-"	background-color: rgb(55, 62, 76);\n"
-"}\n"
-"QSlider::handle:verti"
-                        "cal {\n"
-"    background-color: rgb(85, 170, 255);\n"
-"	border: none;\n"
-"    height: 18px;\n"
-"    width: 18px;\n"
-"    margin: 0px;\n"
-"	border-radius: 9px;\n"
-"}\n"
-"QSlider::handle:vertical:hover {\n"
-"    background-color: rgb(105, 180, 255);\n"
-"}\n"
-"QSlider::handle:vertical:pressed {\n"
-"    background-color: rgb(65, 130, 195);\n"
-"}\n"
-"\n"
-"")
+                                      "QLineEdit {\n"
+                                      "	background-color: rgb(27, 29, 35);\n"
+                                      "	border-radius: 5px;\n"
+                                      "	border: 2px solid rgb(27, 29, 35);\n"
+                                      "	padding-left: 10px;\n"
+                                      "}\n"
+                                      "QLineEdit:hover {\n"
+                                      "	border: 2px solid rgb(64, 71, 88);\n"
+                                      "}\n"
+                                      "QLineEdit:focus {\n"
+                                      "	border: 2px solid rgb(91, 101, 124);\n"
+                                      "}\n"
+                                      "\n"
+                                      "/* SCROLL BARS */\n"
+                                      "QScrollBar:horizontal {\n"
+                                      "    border: none;\n"
+                                      "    background: rgb(52, 59, 72);\n"
+                                      "    height: 14px;\n"
+                                      "    margin: 0px 21px 0 21px;\n"
+                                      "	border-radius: 0px;\n"
+                                      "}\n"
+                                      "QScrollBar::handle:horizontal {\n"
+                                      "    background: rgb(85, 170, 255);\n"
+                                      "    min-width: 25px;\n"
+                                      "	border-radius: 7px\n"
+                                      "}\n"
+                                      "QScrollBar::add-line:horizontal {\n"
+                                      "    border: none;\n"
+                                      "    background: rgb(55, 63, 77);\n"
+                                      "    width: 20px;\n"
+                                      "	border-top-right-radius: 7px;\n"
+                                      "    border-bottom-right-radius: 7px;\n"
+                                      "    subcontrol-position: right;\n"
+                                      "    subcontrol-origin: margin;\n"
+                                      "}\n"
+                                      "QScrollBar::sub-line:horizontal {\n"
+                                      "    border: none;\n"
+                                      "    background: rgb(55, 63, 77);\n"
+                                      "    width: 20px;\n"
+                                      ""
+                                      "	border-top-left-radius: 7px;\n"
+                                      "    border-bottom-left-radius: 7px;\n"
+                                      "    subcontrol-position: left;\n"
+                                      "    subcontrol-origin: margin;\n"
+                                      "}\n"
+                                      "QScrollBar::up-arrow:horizontal, QScrollBar::down-arrow:horizontal\n"
+                                      "{\n"
+                                      "     background: none;\n"
+                                      "}\n"
+                                      "QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal\n"
+                                      "{\n"
+                                      "     background: none;\n"
+                                      "}\n"
+                                      " QScrollBar:vertical {\n"
+                                      "	border: none;\n"
+                                      "    background: rgb(52, 59, 72);\n"
+                                      "    width: 14px;\n"
+                                      "    margin: 21px 0 21px 0;\n"
+                                      "	border-radius: 0px;\n"
+                                      " }\n"
+                                      " QScrollBar::handle:vertical {	\n"
+                                      "	background: rgb(85, 170, 255);\n"
+                                      "    min-height: 25px;\n"
+                                      "	border-radius: 7px\n"
+                                      " }\n"
+                                      " QScrollBar::add-line:vertical {\n"
+                                      "     border: none;\n"
+                                      "    background: rgb(55, 63, 77);\n"
+                                      "     height: 20px;\n"
+                                      "	border-bottom-left-radius: 7px;\n"
+                                      "    border-bottom-right-radius: 7px;\n"
+                                      "     subcontrol-position: bottom;\n"
+                                      "     subcontrol-origin: margin;\n"
+                                      " }\n"
+                                      " QScrollBar::sub-line:vertical {\n"
+                                      "	border: none;\n"
+                                      "    background: rgb(55, 63"
+                                      ", 77);\n"
+                                      "     height: 20px;\n"
+                                      "	border-top-left-radius: 7px;\n"
+                                      "    border-top-right-radius: 7px;\n"
+                                      "     subcontrol-position: top;\n"
+                                      "     subcontrol-origin: margin;\n"
+                                      " }\n"
+                                      " QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {\n"
+                                      "     background: none;\n"
+                                      " }\n"
+                                      "\n"
+                                      " QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {\n"
+                                      "     background: none;\n"
+                                      " }\n"
+                                      "\n"
+                                      "/* CHECKBOX */\n"
+                                      "QCheckBox::indicator {\n"
+                                      "    border: 3px solid rgb(52, 59, 72);\n"
+                                      "	width: 15px;\n"
+                                      "	height: 15px;\n"
+                                      "	border-radius: 10px;\n"
+                                      "    background: rgb(44, 49, 60);\n"
+                                      "}\n"
+                                      "QCheckBox::indicator:hover {\n"
+                                      "    border: 3px solid rgb(58, 66, 81);\n"
+                                      "}\n"
+                                      "QCheckBox::indicator:checked {\n"
+                                      "    background: 3px solid rgb(52, 59, 72);\n"
+                                      "	border: 3px solid rgb(52, 59, 72);	\n"
+                                      "	background-image: url(:/16x16/icons/16x16/cil-check-alt.png);\n"
+                                      "}\n"
+                                      "\n"
+                                      "/* RADIO BUTTON */\n"
+                                      "QRadioButton::indicator {\n"
+                                      "    border: 3px solid rgb(52, 59, 72);\n"
+                                      "	width: 15px;\n"
+                                      "	height: 15px;\n"
+                                      "	border-radius"
+                                      ": 10px;\n"
+                                      "    background: rgb(44, 49, 60);\n"
+                                      "}\n"
+                                      "QRadioButton::indicator:hover {\n"
+                                      "    border: 3px solid rgb(58, 66, 81);\n"
+                                      "}\n"
+                                      "QRadioButton::indicator:checked {\n"
+                                      "    background: 3px solid rgb(94, 106, 130);\n"
+                                      "	border: 3px solid rgb(52, 59, 72);	\n"
+                                      "}\n"
+                                      "\n"
+                                      "/* COMBOBOX */\n"
+                                      "QComboBox{\n"
+                                      "	background-color: rgb(27, 29, 35);\n"
+                                      "	border-radius: 5px;\n"
+                                      "	border: 2px solid rgb(27, 29, 35);\n"
+                                      "	padding: 5px;\n"
+                                      "	padding-left: 10px;\n"
+                                      "}\n"
+                                      "QComboBox:hover{\n"
+                                      "	border: 2px solid rgb(64, 71, 88);\n"
+                                      "}\n"
+                                      "QComboBox::drop-down {\n"
+                                      "	subcontrol-origin: padding;\n"
+                                      "	subcontrol-position: top right;\n"
+                                      "	width: 25px; \n"
+                                      "	border-left-width: 3px;\n"
+                                      "	border-left-color: rgba(39, 44, 54, 150);\n"
+                                      "	border-left-style: solid;\n"
+                                      "	border-top-right-radius: 3px;\n"
+                                      "	border-bottom-right-radius: 3px;	\n"
+                                      "	background-image: url(:/16x16/icons/16x16/cil-arrow-bottom.png);\n"
+                                      "	background-position: center;\n"
+                                      "	background-repeat: no-reperat;\n"
+                                      " }\n"
+                                      "QComboBox QAbstractItemView {\n"
+                                      "	color: rgb("
+                                      "85, 170, 255);	\n"
+                                      "	background-color: rgb(27, 29, 35);\n"
+                                      "	padding: 10px;\n"
+                                      "	selection-background-color: rgb(39, 44, 54);\n"
+                                      "}\n"
+                                      "\n"
+                                      "/* SLIDERS */\n"
+                                      "QSlider::groove:horizontal {\n"
+                                      "    border-radius: 9px;\n"
+                                      "    height: 18px;\n"
+                                      "	margin: 0px;\n"
+                                      "	background-color: rgb(52, 59, 72);\n"
+                                      "}\n"
+                                      "QSlider::groove:horizontal:hover {\n"
+                                      "	background-color: rgb(55, 62, 76);\n"
+                                      "}\n"
+                                      "QSlider::handle:horizontal {\n"
+                                      "    background-color: rgb(85, 170, 255);\n"
+                                      "    border: none;\n"
+                                      "    height: 18px;\n"
+                                      "    width: 18px;\n"
+                                      "    margin: 0px;\n"
+                                      "	border-radius: 9px;\n"
+                                      "}\n"
+                                      "QSlider::handle:horizontal:hover {\n"
+                                      "    background-color: rgb(105, 180, 255);\n"
+                                      "}\n"
+                                      "QSlider::handle:horizontal:pressed {\n"
+                                      "    background-color: rgb(65, 130, 195);\n"
+                                      "}\n"
+                                      "\n"
+                                      "QSlider::groove:vertical {\n"
+                                      "    border-radius: 9px;\n"
+                                      "    width: 18px;\n"
+                                      "    margin: 0px;\n"
+                                      "	background-color: rgb(52, 59, 72);\n"
+                                      "}\n"
+                                      "QSlider::groove:vertical:hover {\n"
+                                      "	background-color: rgb(55, 62, 76);\n"
+                                      "}\n"
+                                      "QSlider::handle:verti"
+                                      "cal {\n"
+                                      "    background-color: rgb(85, 170, 255);\n"
+                                      "	border: none;\n"
+                                      "    height: 18px;\n"
+                                      "    width: 18px;\n"
+                                      "    margin: 0px;\n"
+                                      "	border-radius: 9px;\n"
+                                      "}\n"
+                                      "QSlider::handle:vertical:hover {\n"
+                                      "    background-color: rgb(105, 180, 255);\n"
+                                      "}\n"
+                                      "QSlider::handle:vertical:pressed {\n"
+                                      "    background-color: rgb(65, 130, 195);\n"
+                                      "}\n"
+                                      "\n"
+                                      "")
         self.frame_main.setFrameShape(QFrame.NoFrame)
         self.frame_main.setFrameShadow(QFrame.Raised)
         self.verticalLayout = QVBoxLayout(self.frame_main)
@@ -377,21 +404,20 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.btn_toggle_menu.sizePolicy().hasHeightForWidth())
         self.btn_toggle_menu.setSizePolicy(sizePolicy)
         self.btn_toggle_menu.setStyleSheet(u"QPushButton {\n"
-"	background-image: url(:/24x24/icons/24x24/cil-menu.png);\n"
-"	background-position: center;\n"
-"	background-repeat: no-reperat;\n"
-"	border: none;\n"
-"	background-color: rgb(27, 29, 35);\n"
-"}\n"
-"QPushButton:hover {\n"
-"	background-color: rgb(33, 37, 43);\n"
-"}\n"
-"QPushButton:pressed {	\n"
-"	background-color: rgb(85, 170, 255);\n"
-"}")
+                                           "	background-image: url(:/24x24/icons/24x24/cil-menu.png);\n"
+                                           "	background-position: center;\n"
+                                           "	background-repeat: no-reperat;\n"
+                                           "	border: none;\n"
+                                           "	background-color: rgb(27, 29, 35);\n"
+                                           "}\n"
+                                           "QPushButton:hover {\n"
+                                           "	background-color: rgb(33, 37, 43);\n"
+                                           "}\n"
+                                           "QPushButton:pressed {	\n"
+                                           "	background-color: rgb(85, 170, 255);\n"
+                                           "}")
 
         self.verticalLayout_3.addWidget(self.btn_toggle_menu)
-
 
         self.horizontalLayout_3.addWidget(self.frame_toggle)
 
@@ -431,10 +457,10 @@ class Ui_MainWindow(object):
         self.frame_icon_top_bar.setObjectName(u"frame_icon_top_bar")
         self.frame_icon_top_bar.setMaximumSize(QSize(30, 30))
         self.frame_icon_top_bar.setStyleSheet(u"background: transparent;\n"
-"background-image: url(:/16x16/icons/16x16/cil-terminal.png);\n"
-"background-position: center;\n"
-"background-repeat: no-repeat;\n"
-"")
+                                              "background-image: url(:/16x16/icons/16x16/cil-terminal.png);\n"
+                                              "background-position: center;\n"
+                                              "background-repeat: no-repeat;\n"
+                                              "")
         self.frame_icon_top_bar.setFrameShape(QFrame.StyledPanel)
         self.frame_icon_top_bar.setFrameShadow(QFrame.Raised)
 
@@ -449,10 +475,9 @@ class Ui_MainWindow(object):
         font1.setWeight(75)
         self.label_title_bar_top.setFont(font1)
         self.label_title_bar_top.setStyleSheet(u"background: transparent;\n"
-"")
+                                               "")
 
         self.horizontalLayout_10.addWidget(self.label_title_bar_top)
-
 
         self.horizontalLayout_4.addWidget(self.frame_label_top_btns)
 
@@ -477,15 +502,15 @@ class Ui_MainWindow(object):
         self.btn_minimize.setMinimumSize(QSize(40, 0))
         self.btn_minimize.setMaximumSize(QSize(40, 16777215))
         self.btn_minimize.setStyleSheet(u"QPushButton {	\n"
-"	border: none;\n"
-"	background-color: transparent;\n"
-"}\n"
-"QPushButton:hover {\n"
-"	background-color: rgb(52, 59, 72);\n"
-"}\n"
-"QPushButton:pressed {	\n"
-"	background-color: rgb(85, 170, 255);\n"
-"}")
+                                        "	border: none;\n"
+                                        "	background-color: transparent;\n"
+                                        "}\n"
+                                        "QPushButton:hover {\n"
+                                        "	background-color: rgb(52, 59, 72);\n"
+                                        "}\n"
+                                        "QPushButton:pressed {	\n"
+                                        "	background-color: rgb(85, 170, 255);\n"
+                                        "}")
         icon = QIcon()
         icon.addFile(u":/16x16/icons/16x16/cil-window-minimize.png", QSize(), QIcon.Normal, QIcon.Off)
         self.btn_minimize.setIcon(icon)
@@ -499,15 +524,15 @@ class Ui_MainWindow(object):
         self.btn_maximize_restore.setMinimumSize(QSize(40, 0))
         self.btn_maximize_restore.setMaximumSize(QSize(40, 16777215))
         self.btn_maximize_restore.setStyleSheet(u"QPushButton {	\n"
-"	border: none;\n"
-"	background-color: transparent;\n"
-"}\n"
-"QPushButton:hover {\n"
-"	background-color: rgb(52, 59, 72);\n"
-"}\n"
-"QPushButton:pressed {	\n"
-"	background-color: rgb(85, 170, 255);\n"
-"}")
+                                                "	border: none;\n"
+                                                "	background-color: transparent;\n"
+                                                "}\n"
+                                                "QPushButton:hover {\n"
+                                                "	background-color: rgb(52, 59, 72);\n"
+                                                "}\n"
+                                                "QPushButton:pressed {	\n"
+                                                "	background-color: rgb(85, 170, 255);\n"
+                                                "}")
         icon1 = QIcon()
         icon1.addFile(u":/16x16/icons/16x16/cil-window-maximize.png", QSize(), QIcon.Normal, QIcon.Off)
         self.btn_maximize_restore.setIcon(icon1)
@@ -521,24 +546,22 @@ class Ui_MainWindow(object):
         self.btn_close.setMinimumSize(QSize(40, 0))
         self.btn_close.setMaximumSize(QSize(40, 16777215))
         self.btn_close.setStyleSheet(u"QPushButton {	\n"
-"	border: none;\n"
-"	background-color: transparent;\n"
-"}\n"
-"QPushButton:hover {\n"
-"	background-color: rgb(52, 59, 72);\n"
-"}\n"
-"QPushButton:pressed {	\n"
-"	background-color: rgb(85, 170, 255);\n"
-"}")
+                                     "	border: none;\n"
+                                     "	background-color: transparent;\n"
+                                     "}\n"
+                                     "QPushButton:hover {\n"
+                                     "	background-color: rgb(52, 59, 72);\n"
+                                     "}\n"
+                                     "QPushButton:pressed {	\n"
+                                     "	background-color: rgb(85, 170, 255);\n"
+                                     "}")
         icon2 = QIcon()
         icon2.addFile(u":/16x16/icons/16x16/cil-x.png", QSize(), QIcon.Normal, QIcon.Off)
         self.btn_close.setIcon(icon2)
 
         self.horizontalLayout_5.addWidget(self.btn_close)
 
-
         self.horizontalLayout_4.addWidget(self.frame_btns_right, 0, Qt.AlignRight)
-
 
         self.verticalLayout_2.addWidget(self.frame_top_btns)
 
@@ -572,16 +595,13 @@ class Ui_MainWindow(object):
         font3.setWeight(75)
         self.label_top_info_2.setFont(font3)
         self.label_top_info_2.setStyleSheet(u"color: rgb(98, 103, 111);")
-        self.label_top_info_2.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label_top_info_2.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
 
         self.horizontalLayout_8.addWidget(self.label_top_info_2)
 
-
         self.verticalLayout_2.addWidget(self.frame_top_info)
 
-
         self.horizontalLayout_3.addWidget(self.frame_top_right)
-
 
         self.verticalLayout.addWidget(self.frame_top)
 
@@ -648,19 +668,17 @@ class Ui_MainWindow(object):
         font4.setPointSize(12)
         self.label_user_icon.setFont(font4)
         self.label_user_icon.setStyleSheet(u"QLabel {\n"
-"	border-radius: 30px;\n"
-"	background-color: rgb(44, 49, 60);\n"
-"	border: 5px solid rgb(39, 44, 54);\n"
-"	background-position: center;\n"
-"	background-repeat: no-repeat;\n"
-"}")
+                                           "	border-radius: 30px;\n"
+                                           "	background-color: rgb(44, 49, 60);\n"
+                                           "	border: 5px solid rgb(39, 44, 54);\n"
+                                           "	background-position: center;\n"
+                                           "	background-repeat: no-repeat;\n"
+                                           "}")
         self.label_user_icon.setAlignment(Qt.AlignCenter)
 
         self.layout_menu_bottom.addWidget(self.label_user_icon, 0, Qt.AlignHCenter)
 
-
         self.verticalLayout_5.addWidget(self.frame_extra_menus, 0, Qt.AlignBottom)
-
 
         self.horizontalLayout_2.addWidget(self.frame_left_menu)
 
@@ -698,16 +716,13 @@ class Ui_MainWindow(object):
         self.label_6.setAlignment(Qt.AlignCenter)
 
         self.verticalLayout_10.addWidget(self.label_6)
-
-        self.label = QLabel(self.page_home)
-        self.label.setObjectName(u"label")
+        
+        self.map_view = MapWidget()
         font6 = QFont()
         font6.setFamily(u"Segoe UI")
         font6.setPointSize(14)
-        self.label.setFont(font6)
-        self.label.setAlignment(Qt.AlignCenter)
 
-        self.verticalLayout_10.addWidget(self.label)
+        self.verticalLayout_10.addWidget(self.map_view)
 
         self.label_7 = QLabel(self.page_home)
         self.label_7.setObjectName(u"label_7")
@@ -738,8 +753,8 @@ class Ui_MainWindow(object):
         self.frame_div_content_1.setMinimumSize(QSize(0, 110))
         self.frame_div_content_1.setMaximumSize(QSize(16777215, 110))
         self.frame_div_content_1.setStyleSheet(u"background-color: rgb(41, 45, 56);\n"
-"border-radius: 5px;\n"
-"")
+                                               "border-radius: 5px;\n"
+                                               "")
         self.frame_div_content_1.setFrameShape(QFrame.NoFrame)
         self.frame_div_content_1.setFrameShadow(QFrame.Raised)
         self.verticalLayout_7 = QVBoxLayout(self.frame_div_content_1)
@@ -761,7 +776,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_8.addWidget(self.labelBoxBlenderInstalation)
 
-
         self.verticalLayout_7.addWidget(self.frame_title_wid_1)
 
         self.frame_content_wid_1 = QFrame(self.frame_div_content_1)
@@ -777,17 +791,17 @@ class Ui_MainWindow(object):
         self.lineEdit.setObjectName(u"lineEdit")
         self.lineEdit.setMinimumSize(QSize(0, 30))
         self.lineEdit.setStyleSheet(u"QLineEdit {\n"
-"	background-color: rgb(27, 29, 35);\n"
-"	border-radius: 5px;\n"
-"	border: 2px solid rgb(27, 29, 35);\n"
-"	padding-left: 10px;\n"
-"}\n"
-"QLineEdit:hover {\n"
-"	border: 2px solid rgb(64, 71, 88);\n"
-"}\n"
-"QLineEdit:focus {\n"
-"	border: 2px solid rgb(91, 101, 124);\n"
-"}")
+                                    "	background-color: rgb(27, 29, 35);\n"
+                                    "	border-radius: 5px;\n"
+                                    "	border: 2px solid rgb(27, 29, 35);\n"
+                                    "	padding-left: 10px;\n"
+                                    "}\n"
+                                    "QLineEdit:hover {\n"
+                                    "	border: 2px solid rgb(64, 71, 88);\n"
+                                    "}\n"
+                                    "QLineEdit:focus {\n"
+                                    "	border: 2px solid rgb(91, 101, 124);\n"
+                                    "}")
 
         self.gridLayout.addWidget(self.lineEdit, 0, 0, 1, 1)
 
@@ -799,18 +813,18 @@ class Ui_MainWindow(object):
         font8.setPointSize(9)
         self.pushButton.setFont(font8)
         self.pushButton.setStyleSheet(u"QPushButton {\n"
-"	border: 2px solid rgb(52, 59, 72);\n"
-"	border-radius: 5px;	\n"
-"	background-color: rgb(52, 59, 72);\n"
-"}\n"
-"QPushButton:hover {\n"
-"	background-color: rgb(57, 65, 80);\n"
-"	border: 2px solid rgb(61, 70, 86);\n"
-"}\n"
-"QPushButton:pressed {	\n"
-"	background-color: rgb(35, 40, 49);\n"
-"	border: 2px solid rgb(43, 50, 61);\n"
-"}")
+                                      "	border: 2px solid rgb(52, 59, 72);\n"
+                                      "	border-radius: 5px;	\n"
+                                      "	background-color: rgb(52, 59, 72);\n"
+                                      "}\n"
+                                      "QPushButton:hover {\n"
+                                      "	background-color: rgb(57, 65, 80);\n"
+                                      "	border: 2px solid rgb(61, 70, 86);\n"
+                                      "}\n"
+                                      "QPushButton:pressed {	\n"
+                                      "	background-color: rgb(35, 40, 49);\n"
+                                      "	border: 2px solid rgb(43, 50, 61);\n"
+                                      "}")
         icon3 = QIcon()
         icon3.addFile(u":/16x16/icons/16x16/cil-folder-open.png", QSize(), QIcon.Normal, QIcon.Off)
         self.pushButton.setIcon(icon3)
@@ -821,19 +835,15 @@ class Ui_MainWindow(object):
         self.labelVersion_3.setObjectName(u"labelVersion_3")
         self.labelVersion_3.setStyleSheet(u"color: rgb(98, 103, 111);")
         self.labelVersion_3.setLineWidth(1)
-        self.labelVersion_3.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+        self.labelVersion_3.setAlignment(Qt.AlignLeading | Qt.AlignLeft | Qt.AlignVCenter)
 
         self.gridLayout.addWidget(self.labelVersion_3, 1, 0, 1, 2)
 
-
         self.horizontalLayout_9.addLayout(self.gridLayout)
-
 
         self.verticalLayout_7.addWidget(self.frame_content_wid_1)
 
-
         self.verticalLayout_15.addWidget(self.frame_div_content_1)
-
 
         self.verticalLayout_6.addWidget(self.frame)
 
@@ -841,7 +851,7 @@ class Ui_MainWindow(object):
         self.frame_2.setObjectName(u"frame_2")
         self.frame_2.setMinimumSize(QSize(0, 150))
         self.frame_2.setStyleSheet(u"background-color: rgb(39, 44, 54);\n"
-"border-radius: 5px;")
+                                   "border-radius: 5px;")
         self.frame_2.setFrameShape(QFrame.StyledPanel)
         self.frame_2.setFrameShadow(QFrame.Raised)
         self.verticalLayout_11 = QVBoxLayout(self.frame_2)
@@ -871,12 +881,12 @@ class Ui_MainWindow(object):
         self.verticalScrollBar = QScrollBar(self.frame_2)
         self.verticalScrollBar.setObjectName(u"verticalScrollBar")
         self.verticalScrollBar.setStyleSheet(u" QScrollBar:vertical {\n"
-"	border: none;\n"
-"    background: rgb(52, 59, 72);\n"
-"    width: 14px;\n"
-"    margin: 21px 0 21px 0;\n"
-"	border-radius: 0px;\n"
-" }")
+                                             "	border: none;\n"
+                                             "    background: rgb(52, 59, 72);\n"
+                                             "    width: 14px;\n"
+                                             "    margin: 21px 0 21px 0;\n"
+                                             "	border-radius: 0px;\n"
+                                             " }")
         self.verticalScrollBar.setOrientation(Qt.Vertical)
 
         self.gridLayout_2.addWidget(self.verticalScrollBar, 0, 4, 3, 1)
@@ -884,24 +894,24 @@ class Ui_MainWindow(object):
         self.scrollArea = QScrollArea(self.frame_2)
         self.scrollArea.setObjectName(u"scrollArea")
         self.scrollArea.setStyleSheet(u"QScrollArea {\n"
-"	border: none;\n"
-"	border-radius: 0px;\n"
-"}\n"
-"QScrollBar:horizontal {\n"
-"    border: none;\n"
-"    background: rgb(52, 59, 72);\n"
-"    height: 14px;\n"
-"    margin: 0px 21px 0 21px;\n"
-"	border-radius: 0px;\n"
-"}\n"
-" QScrollBar:vertical {\n"
-"	border: none;\n"
-"    background: rgb(52, 59, 72);\n"
-"    width: 14px;\n"
-"    margin: 21px 0 21px 0;\n"
-"	border-radius: 0px;\n"
-" }\n"
-"")
+                                      "	border: none;\n"
+                                      "	border-radius: 0px;\n"
+                                      "}\n"
+                                      "QScrollBar:horizontal {\n"
+                                      "    border: none;\n"
+                                      "    background: rgb(52, 59, 72);\n"
+                                      "    height: 14px;\n"
+                                      "    margin: 0px 21px 0 21px;\n"
+                                      "	border-radius: 0px;\n"
+                                      "}\n"
+                                      " QScrollBar:vertical {\n"
+                                      "	border: none;\n"
+                                      "    background: rgb(52, 59, 72);\n"
+                                      "    width: 14px;\n"
+                                      "    margin: 21px 0 21px 0;\n"
+                                      "	border-radius: 0px;\n"
+                                      " }\n"
+                                      "")
         self.scrollArea.setFrameShape(QFrame.NoFrame)
         self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -915,16 +925,16 @@ class Ui_MainWindow(object):
         self.plainTextEdit.setObjectName(u"plainTextEdit")
         self.plainTextEdit.setMinimumSize(QSize(200, 200))
         self.plainTextEdit.setStyleSheet(u"QPlainTextEdit {\n"
-"	background-color: rgb(27, 29, 35);\n"
-"	border-radius: 5px;\n"
-"	padding: 10px;\n"
-"}\n"
-"QPlainTextEdit:hover {\n"
-"	border: 2px solid rgb(64, 71, 88);\n"
-"}\n"
-"QPlainTextEdit:focus {\n"
-"	border: 2px solid rgb(91, 101, 124);\n"
-"}")
+                                         "	background-color: rgb(27, 29, 35);\n"
+                                         "	border-radius: 5px;\n"
+                                         "	padding: 10px;\n"
+                                         "}\n"
+                                         "QPlainTextEdit:hover {\n"
+                                         "	border: 2px solid rgb(64, 71, 88);\n"
+                                         "}\n"
+                                         "QPlainTextEdit:focus {\n"
+                                         "	border: 2px solid rgb(91, 101, 124);\n"
+                                         "}")
 
         self.horizontalLayout_11.addWidget(self.plainTextEdit)
 
@@ -940,21 +950,21 @@ class Ui_MainWindow(object):
         self.comboBox.setFont(font8)
         self.comboBox.setAutoFillBackground(False)
         self.comboBox.setStyleSheet(u"QComboBox{\n"
-"	background-color: rgb(27, 29, 35);\n"
-"	border-radius: 5px;\n"
-"	border: 2px solid rgb(27, 29, 35);\n"
-"	padding: 5px;\n"
-"	padding-left: 10px;\n"
-"}\n"
-"QComboBox:hover{\n"
-"	border: 2px solid rgb(64, 71, 88);\n"
-"}\n"
-"QComboBox QAbstractItemView {\n"
-"	color: rgb(85, 170, 255);	\n"
-"	background-color: rgb(27, 29, 35);\n"
-"	padding: 10px;\n"
-"	selection-background-color: rgb(39, 44, 54);\n"
-"}")
+                                    "	background-color: rgb(27, 29, 35);\n"
+                                    "	border-radius: 5px;\n"
+                                    "	border: 2px solid rgb(27, 29, 35);\n"
+                                    "	padding: 5px;\n"
+                                    "	padding-left: 10px;\n"
+                                    "}\n"
+                                    "QComboBox:hover{\n"
+                                    "	border: 2px solid rgb(64, 71, 88);\n"
+                                    "}\n"
+                                    "QComboBox QAbstractItemView {\n"
+                                    "	color: rgb(85, 170, 255);	\n"
+                                    "	background-color: rgb(27, 29, 35);\n"
+                                    "	padding: 10px;\n"
+                                    "	selection-background-color: rgb(39, 44, 54);\n"
+                                    "}")
         self.comboBox.setIconSize(QSize(16, 16))
         self.comboBox.setFrame(True)
 
@@ -968,13 +978,13 @@ class Ui_MainWindow(object):
         sizePolicy5.setHeightForWidth(self.horizontalScrollBar.sizePolicy().hasHeightForWidth())
         self.horizontalScrollBar.setSizePolicy(sizePolicy5)
         self.horizontalScrollBar.setStyleSheet(u"QScrollBar:horizontal {\n"
-"    border: none;\n"
-"    background: rgb(52, 59, 72);\n"
-"    height: 14px;\n"
-"    margin: 0px 21px 0 21px;\n"
-"	border-radius: 0px;\n"
-"}\n"
-"")
+                                               "    border: none;\n"
+                                               "    background: rgb(52, 59, 72);\n"
+                                               "    height: 14px;\n"
+                                               "    margin: 0px 21px 0 21px;\n"
+                                               "	border-radius: 0px;\n"
+                                               "}\n"
+                                               "")
         self.horizontalScrollBar.setOrientation(Qt.Horizontal)
 
         self.gridLayout_2.addWidget(self.horizontalScrollBar, 1, 3, 1, 1)
@@ -982,18 +992,18 @@ class Ui_MainWindow(object):
         self.commandLinkButton = QCommandLinkButton(self.frame_2)
         self.commandLinkButton.setObjectName(u"commandLinkButton")
         self.commandLinkButton.setStyleSheet(u"QCommandLinkButton {	\n"
-"	color: rgb(85, 170, 255);\n"
-"	border-radius: 5px;\n"
-"	padding: 5px;\n"
-"}\n"
-"QCommandLinkButton:hover {	\n"
-"	color: rgb(210, 210, 210);\n"
-"	background-color: rgb(44, 49, 60);\n"
-"}\n"
-"QCommandLinkButton:pressed {	\n"
-"	color: rgb(210, 210, 210);\n"
-"	background-color: rgb(52, 58, 71);\n"
-"}")
+                                             "	color: rgb(85, 170, 255);\n"
+                                             "	border-radius: 5px;\n"
+                                             "	padding: 5px;\n"
+                                             "}\n"
+                                             "QCommandLinkButton:hover {	\n"
+                                             "	color: rgb(210, 210, 210);\n"
+                                             "	background-color: rgb(44, 49, 60);\n"
+                                             "}\n"
+                                             "QCommandLinkButton:pressed {	\n"
+                                             "	color: rgb(210, 210, 210);\n"
+                                             "	background-color: rgb(52, 58, 71);\n"
+                                             "}")
         icon4 = QIcon()
         icon4.addFile(u":/16x16/icons/16x16/cil-link.png", QSize(), QIcon.Normal, QIcon.Off)
         self.commandLinkButton.setIcon(icon4)
@@ -1007,9 +1017,7 @@ class Ui_MainWindow(object):
 
         self.gridLayout_2.addWidget(self.horizontalSlider, 2, 0, 1, 2)
 
-
         self.verticalLayout_11.addLayout(self.gridLayout_2)
-
 
         self.verticalLayout_6.addWidget(self.frame_2)
 
@@ -1090,9 +1098,9 @@ class Ui_MainWindow(object):
         palette1.setBrush(QPalette.Active, QPalette.Window, brush15)
         brush16 = QBrush(QColor(210, 210, 210, 128))
         brush16.setStyle(Qt.NoBrush)
-#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+        # if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
         palette1.setBrush(QPalette.Active, QPalette.PlaceholderText, brush16)
-#endif
+        # endif
         palette1.setBrush(QPalette.Inactive, QPalette.WindowText, brush6)
         palette1.setBrush(QPalette.Inactive, QPalette.Button, brush15)
         palette1.setBrush(QPalette.Inactive, QPalette.Text, brush6)
@@ -1101,9 +1109,9 @@ class Ui_MainWindow(object):
         palette1.setBrush(QPalette.Inactive, QPalette.Window, brush15)
         brush17 = QBrush(QColor(210, 210, 210, 128))
         brush17.setStyle(Qt.NoBrush)
-#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+        # if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
         palette1.setBrush(QPalette.Inactive, QPalette.PlaceholderText, brush17)
-#endif
+        # endif
         palette1.setBrush(QPalette.Disabled, QPalette.WindowText, brush6)
         palette1.setBrush(QPalette.Disabled, QPalette.Button, brush15)
         palette1.setBrush(QPalette.Disabled, QPalette.Text, brush6)
@@ -1112,65 +1120,65 @@ class Ui_MainWindow(object):
         palette1.setBrush(QPalette.Disabled, QPalette.Window, brush15)
         brush18 = QBrush(QColor(210, 210, 210, 128))
         brush18.setStyle(Qt.NoBrush)
-#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
+        # if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
         palette1.setBrush(QPalette.Disabled, QPalette.PlaceholderText, brush18)
-#endif
+        # endif
         self.tableWidget.setPalette(palette1)
         self.tableWidget.setStyleSheet(u"QTableWidget {	\n"
-"	background-color: rgb(39, 44, 54);\n"
-"	padding: 10px;\n"
-"	border-radius: 5px;\n"
-"	gridline-color: rgb(44, 49, 60);\n"
-"	border-bottom: 1px solid rgb(44, 49, 60);\n"
-"}\n"
-"QTableWidget::item{\n"
-"	border-color: rgb(44, 49, 60);\n"
-"	padding-left: 5px;\n"
-"	padding-right: 5px;\n"
-"	gridline-color: rgb(44, 49, 60);\n"
-"}\n"
-"QTableWidget::item:selected{\n"
-"	background-color: rgb(85, 170, 255);\n"
-"}\n"
-"QScrollBar:horizontal {\n"
-"    border: none;\n"
-"    background: rgb(52, 59, 72);\n"
-"    height: 14px;\n"
-"    margin: 0px 21px 0 21px;\n"
-"	border-radius: 0px;\n"
-"}\n"
-" QScrollBar:vertical {\n"
-"	border: none;\n"
-"    background: rgb(52, 59, 72);\n"
-"    width: 14px;\n"
-"    margin: 21px 0 21px 0;\n"
-"	border-radius: 0px;\n"
-" }\n"
-"QHeaderView::section{\n"
-"	Background-color: rgb(39, 44, 54);\n"
-"	max-width: 30px;\n"
-"	border: 1px solid rgb(44, 49, 60);\n"
-"	border-style: none;\n"
-"    border-bottom: 1px solid rgb(44, 49, 60);\n"
-"    border-right: 1px solid rgb(44, 49, 60);\n"
-"}\n"
-""
-                        "QTableWidget::horizontalHeader {	\n"
-"	background-color: rgb(81, 255, 0);\n"
-"}\n"
-"QHeaderView::section:horizontal\n"
-"{\n"
-"    border: 1px solid rgb(32, 34, 42);\n"
-"	background-color: rgb(27, 29, 35);\n"
-"	padding: 3px;\n"
-"	border-top-left-radius: 7px;\n"
-"    border-top-right-radius: 7px;\n"
-"}\n"
-"QHeaderView::section:vertical\n"
-"{\n"
-"    border: 1px solid rgb(44, 49, 60);\n"
-"}\n"
-"")
+                                       "	background-color: rgb(39, 44, 54);\n"
+                                       "	padding: 10px;\n"
+                                       "	border-radius: 5px;\n"
+                                       "	gridline-color: rgb(44, 49, 60);\n"
+                                       "	border-bottom: 1px solid rgb(44, 49, 60);\n"
+                                       "}\n"
+                                       "QTableWidget::item{\n"
+                                       "	border-color: rgb(44, 49, 60);\n"
+                                       "	padding-left: 5px;\n"
+                                       "	padding-right: 5px;\n"
+                                       "	gridline-color: rgb(44, 49, 60);\n"
+                                       "}\n"
+                                       "QTableWidget::item:selected{\n"
+                                       "	background-color: rgb(85, 170, 255);\n"
+                                       "}\n"
+                                       "QScrollBar:horizontal {\n"
+                                       "    border: none;\n"
+                                       "    background: rgb(52, 59, 72);\n"
+                                       "    height: 14px;\n"
+                                       "    margin: 0px 21px 0 21px;\n"
+                                       "	border-radius: 0px;\n"
+                                       "}\n"
+                                       " QScrollBar:vertical {\n"
+                                       "	border: none;\n"
+                                       "    background: rgb(52, 59, 72);\n"
+                                       "    width: 14px;\n"
+                                       "    margin: 21px 0 21px 0;\n"
+                                       "	border-radius: 0px;\n"
+                                       " }\n"
+                                       "QHeaderView::section{\n"
+                                       "	Background-color: rgb(39, 44, 54);\n"
+                                       "	max-width: 30px;\n"
+                                       "	border: 1px solid rgb(44, 49, 60);\n"
+                                       "	border-style: none;\n"
+                                       "    border-bottom: 1px solid rgb(44, 49, 60);\n"
+                                       "    border-right: 1px solid rgb(44, 49, 60);\n"
+                                       "}\n"
+                                       ""
+                                       "QTableWidget::horizontalHeader {	\n"
+                                       "	background-color: rgb(81, 255, 0);\n"
+                                       "}\n"
+                                       "QHeaderView::section:horizontal\n"
+                                       "{\n"
+                                       "    border: 1px solid rgb(32, 34, 42);\n"
+                                       "	background-color: rgb(27, 29, 35);\n"
+                                       "	padding: 3px;\n"
+                                       "	border-top-left-radius: 7px;\n"
+                                       "    border-top-right-radius: 7px;\n"
+                                       "}\n"
+                                       "QHeaderView::section:vertical\n"
+                                       "{\n"
+                                       "    border: 1px solid rgb(44, 49, 60);\n"
+                                       "}\n"
+                                       "")
         self.tableWidget.setFrameShape(QFrame.NoFrame)
         self.tableWidget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.tableWidget.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
@@ -1192,13 +1200,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_12.addWidget(self.tableWidget)
 
-
         self.verticalLayout_6.addWidget(self.frame_3)
 
         self.stackedWidget.addWidget(self.page_widgets)
 
         self.verticalLayout_9.addWidget(self.stackedWidget)
-
 
         self.verticalLayout_4.addWidget(self.frame_content)
 
@@ -1233,10 +1239,9 @@ class Ui_MainWindow(object):
         self.label_version.setMaximumSize(QSize(100, 16777215))
         self.label_version.setFont(font2)
         self.label_version.setStyleSheet(u"color: rgb(98, 103, 111);")
-        self.label_version.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label_version.setAlignment(Qt.AlignRight | Qt.AlignTrailing | Qt.AlignVCenter)
 
         self.horizontalLayout_7.addWidget(self.label_version)
-
 
         self.horizontalLayout_6.addWidget(self.frame_label_bottom)
 
@@ -1244,28 +1249,25 @@ class Ui_MainWindow(object):
         self.frame_size_grip.setObjectName(u"frame_size_grip")
         self.frame_size_grip.setMaximumSize(QSize(20, 20))
         self.frame_size_grip.setStyleSheet(u"QSizeGrip {\n"
-"	background-image: url(:/16x16/icons/16x16/cil-size-grip.png);\n"
-"	background-position: center;\n"
-"	background-repeat: no-reperat;\n"
-"}")
+                                           "	background-image: url(:/16x16/icons/16x16/cil-size-grip.png);\n"
+                                           "	background-position: center;\n"
+                                           "	background-repeat: no-reperat;\n"
+                                           "}")
         self.frame_size_grip.setFrameShape(QFrame.NoFrame)
         self.frame_size_grip.setFrameShadow(QFrame.Raised)
 
         self.horizontalLayout_6.addWidget(self.frame_size_grip)
 
-
         self.verticalLayout_4.addWidget(self.frame_grip)
-
 
         self.horizontalLayout_2.addWidget(self.frame_content_right)
 
-
         self.verticalLayout.addWidget(self.frame_center)
-
 
         self.horizontalLayout.addWidget(self.frame_main)
 
         MainWindow.setCentralWidget(self.centralwidget)
+        
         QWidget.setTabOrder(self.btn_minimize, self.btn_maximize_restore)
         QWidget.setTabOrder(self.btn_maximize_restore, self.btn_close)
         QWidget.setTabOrder(self.btn_close, self.btn_toggle_menu)
@@ -1283,36 +1285,38 @@ class Ui_MainWindow(object):
 
         self.stackedWidget.setCurrentIndex(1)
 
-
         QMetaObject.connectSlotsByName(MainWindow)
+
     # setupUi
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.btn_toggle_menu.setText("")
         self.label_title_bar_top.setText(QCoreApplication.translate("MainWindow", u"Main Window - Base", None))
-#if QT_CONFIG(tooltip)
+        # if QT_CONFIG(tooltip)
         self.btn_minimize.setToolTip(QCoreApplication.translate("MainWindow", u"Minimize", None))
-#endif // QT_CONFIG(tooltip)
+        # endif // QT_CONFIG(tooltip)
         self.btn_minimize.setText("")
-#if QT_CONFIG(tooltip)
+        # if QT_CONFIG(tooltip)
         self.btn_maximize_restore.setToolTip(QCoreApplication.translate("MainWindow", u"Maximize", None))
-#endif // QT_CONFIG(tooltip)
+        # endif // QT_CONFIG(tooltip)
         self.btn_maximize_restore.setText("")
-#if QT_CONFIG(tooltip)
+        # if QT_CONFIG(tooltip)
         self.btn_close.setToolTip(QCoreApplication.translate("MainWindow", u"Close", None))
-#endif // QT_CONFIG(tooltip)
+        # endif // QT_CONFIG(tooltip)
         self.btn_close.setText("")
-        self.label_top_info_1.setText(QCoreApplication.translate("MainWindow", u"C:\\Program Files\\Blender Foundation\\Blender 2.82", None))
+        self.label_top_info_1.setText(
+            QCoreApplication.translate("MainWindow", u"C:\\Program Files\\Blender Foundation\\Blender 2.82", None))
         self.label_top_info_2.setText(QCoreApplication.translate("MainWindow", u"| HOME", None))
         self.label_user_icon.setText(QCoreApplication.translate("MainWindow", u"WM", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"HOME", None))
-        self.label.setText(QCoreApplication.translate("MainWindow", u"Add MAP Here Please", None))
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Page Index 0", None))
         self.labelBoxBlenderInstalation.setText(QCoreApplication.translate("MainWindow", u"BLENDER INSTALLATION", None))
         self.lineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Your Password", None))
         self.pushButton.setText(QCoreApplication.translate("MainWindow", u"Open Blender", None))
-        self.labelVersion_3.setText(QCoreApplication.translate("MainWindow", u"Ex: C:Program FilesBlender FoundationBlender 2.82 blender.exe", None))
+        self.labelVersion_3.setText(
+            QCoreApplication.translate("MainWindow", u"Ex: C:Program FilesBlender FoundationBlender 2.82 blender.exe",
+                                       None))
         self.checkBox.setText(QCoreApplication.translate("MainWindow", u"CheckBox", None))
         self.radioButton.setText(QCoreApplication.translate("MainWindow", u"RadioButton", None))
         self.comboBox.setItemText(0, QCoreApplication.translate("MainWindow", u"Test 1", None))
@@ -1376,4 +1380,13 @@ class Ui_MainWindow(object):
 
         self.label_credits.setText(QCoreApplication.translate("MainWindow", u"amash mapUI", None))
         self.label_version.setText(QCoreApplication.translate("MainWindow", u"v1.0.0", None))
+
     # retranslateUi
+
+    def updateModalText(self, text):
+        self.label_modal.setText(text)
+
+    def openModalWindow(self):
+        self.modal.show()
+        self.modal.setWindowState(Qt.WindowState.WindowActive)
+        self.updateModalText(log_stream.getvalue())

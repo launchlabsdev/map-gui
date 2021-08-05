@@ -53,6 +53,7 @@ class MainWindow(QMainWindow):
         UIFunctions.addNewMenu(self, "HOME", "btn_home", "url(:/16x16/icons/16x16/cil-home.png)", True)
         UIFunctions.addNewMenu(self, "Add User", "btn_new_user", "url(:/16x16/icons/16x16/cil-user-follow.png)", True)
         UIFunctions.addNewMenu(self, "Custom Widgets", "btn_widgets", "url(:/16x16/icons/16x16/cil-equalizer.png)", False)
+        UIFunctions.addNewMenu(self, "View Logging info", "btn_logger", "", False)
         ## ==> END ##
 
         # START MENU => SELECTION
@@ -152,7 +153,9 @@ class MainWindow(QMainWindow):
             UIFunctions.resetStyle(self, "btn_widgets")
             UIFunctions.labelPage(self, "Custom Widgets")
             btnWidget.setStyleSheet(UIFunctions.selectMenu(btnWidget.styleSheet()))
-
+        # LOGGING WINDOW
+        if btnWidget.objectName() == "btn_logger":
+            self.ui.openModalWindow()
     ## ==> END ##
 
     ########################################################################
