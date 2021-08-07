@@ -52,6 +52,7 @@ class MainWindow(QMainWindow):
         self.ui.stackedWidget.setMinimumWidth(20)
         UIFunctions.addNewMenu(self, "HOME", "btn_home", "url(:/16x16/icons/16x16/cil-home.png)", True)
         UIFunctions.addNewMenu(self, "Add User", "btn_new_user", "url(:/16x16/icons/16x16/cil-user-follow.png)", True)
+        UIFunctions.addNewMenu(self, "Map", "btn_map", "", True)
         UIFunctions.addNewMenu(self, "Custom Widgets", "btn_widgets", "url(:/16x16/icons/16x16/cil-equalizer.png)", False)
         UIFunctions.addNewMenu(self, "View Logging info", "btn_logger", "", False)
         ## ==> END ##
@@ -155,7 +156,10 @@ class MainWindow(QMainWindow):
             btnWidget.setStyleSheet(UIFunctions.selectMenu(btnWidget.styleSheet()))
         # LOGGING WINDOW
         if btnWidget.objectName() == "btn_logger":
-            self.ui.openModalWindow()
+            self.ui.openLoggingWindow() 
+        # Map WINDOW
+        if btnWidget.objectName() == "btn_map":
+            self.ui.openMapWindow()
     ## ==> END ##
 
     ########################################################################

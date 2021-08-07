@@ -717,12 +717,11 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_10.addWidget(self.label_6)
         
-        self.map_view = MapWidget()
+       
         font6 = QFont()
         font6.setFamily(u"Segoe UI")
         font6.setPointSize(14)
 
-        self.verticalLayout_10.addWidget(self.map_view)
 
         self.label_7 = QLabel(self.page_home)
         self.label_7.setObjectName(u"label_7")
@@ -1282,6 +1281,8 @@ class Ui_MainWindow(object):
         QWidget.setTabOrder(self.tableWidget, self.commandLinkButton)
 
         self.retranslateUi(MainWindow)
+        self.map_view = MapWidget()
+        self.map_view.setMinimumSize(810,610)
 
         self.stackedWidget.setCurrentIndex(1)
 
@@ -1386,7 +1387,11 @@ class Ui_MainWindow(object):
     def updateModalText(self, text):
         self.label_modal.setText(text)
 
-    def openModalWindow(self):
+    def openLoggingWindow(self):
         self.modal.show()
         self.modal.setWindowState(Qt.WindowState.WindowActive)
         self.updateModalText(log_stream.getvalue())
+
+    def openMapWindow(self):
+        self.map_view .show()
+        self.map_view.setWindowState(Qt.WindowState.WindowActive)
